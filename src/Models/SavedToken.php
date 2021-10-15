@@ -46,7 +46,9 @@ class SavedToken extends TerminusModel implements SessionAwareInterface, DataSto
             'form_params' => ['machine_token' => $this->get('token'), 'client' => 'terminus',],
             'method' => 'post',
         ];
+        var_dump($options);
         $response = $this->request->request('authorize/machine-token', $options);
+        var_dump(['response' => $response]);
         $this->session()->setData((array)$response['data']);
         return $this->session->getUser();
     }

@@ -44,19 +44,24 @@ class SavedTokens extends TerminusCollection implements ConfigAwareInterface, Da
      */
     public function create($token_string)
     {
+        var_dump(['tks' => $token_string]);
+
         $token_nickname = "token-" . \uniqid();
         $this->getContainer()->add($token_nickname, SavedToken::class)
             ->addArguments([
                 (object)['token' => $token_string],
                 ['collection' => $this]
             ]);
-        $token =  $this->getContainer()->get($token_nickname);
+        /** @var \Pantheon\Terminus\Models\SavedToken $token */
+        $token = $this->getContainer()->get($token_nickname);
         $token->setDataStore($this->getDataStore());
         $user = $token->logIn();
         $user->fetch();
         $user_email = $user->get('email');
+        var_dump($user_email);
         $token->id = $user_email;
         $token->set('email', $user_email);
+        var_dump(['token' => $token->serialize()]);
         $token->saveToDir();
         $this->models[$token->id] = $token;
     }
@@ -81,9 +86,21 @@ class SavedTokens extends TerminusCollection implements ConfigAwareInterface, Da
 
             $tokens = [];
             foreach ($keys as $key) {
+                if ('tokens' !== $key) {
+                    continue;
+                }
+
+                $token = $this->getDataStore()->get($key);
+                if (null === $token) {
+                    continue;
+                }
+
                 $tokens[] = $this->getDataStore()->get($key);
             }
-            $this->setData($tokens);
+
+            if (count($tokens) > 0) {
+                $this->setData($tokens);
+            }
         }
         return parent::getData();
     }

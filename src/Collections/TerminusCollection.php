@@ -92,6 +92,12 @@ abstract class TerminusCollection implements ContainerAwareInterface, RequestAwa
     {
         foreach ($this->getData() as $id => $model_data) {
             if (!isset($model_data->id)) {
+//                $a = [
+//                    'id' => $id,
+//                    'model_data' => $model_data,
+//                ];
+//                var_dump($a);
+//                exit;
                 $model_data->id = $id;
             }
             $this->add($model_data);
